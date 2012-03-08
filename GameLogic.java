@@ -66,8 +66,10 @@ public class GameLogic implements IGameLogic {
         }
     }
 
+
     public int decideNextMove() {
         //TODO Write your implementation for this method
+    	//HEr skal ske noget!!!
         return 0;
     }
 
