@@ -1,4 +1,4 @@
-
+// http://www.overclockers.com/forums/showthread.php?t=554653
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,12 +30,12 @@ public class GameLogic implements IGameLogic {
             }
         }
 //        this.board[1][2] = 1;
-        this.insertCoin(1, 1);
+        this.insertCoin(1, 2);
         this.insertCoin(2, 1);
-        this.insertCoin(1, 1);
+        this.insertCoin(1, 2);
         this.insertCoin(3, 1);
         this.insertCoin(1, 1);
-        this.insertCoin(4, 1);
+        this.insertCoin(4, 2);
         this.insertCoin(1, 1);
         this.printBoard();
         System.out.println("winner:" + this.hasWinner());
@@ -44,7 +44,19 @@ public class GameLogic implements IGameLogic {
     }
 
     public Winner gameFinished() {
-        //TODO Write your implementation for this method
+        int winner = this.hasWinner();
+        switch (winner) {
+            case 1:
+                return Winner.PLAYER1;
+
+            case 2:
+                return Winner.PLAYER2;
+
+        }
+        
+        if (this.isFull()){
+            return Winner.TIE;
+        }
         return Winner.NOT_FINISHED;
     }
 
@@ -66,10 +78,9 @@ public class GameLogic implements IGameLogic {
         }
     }
 
-
     public int decideNextMove() {
         //TODO Write your implementation for this method
-    	//HEr skal ske noget!!!
+        //HEr skal ske noget!!!
         return 0;
     }
 
@@ -100,14 +111,12 @@ public class GameLogic implements IGameLogic {
 
     private boolean hasFourSouthEast(int c, int r) {
         int color = this.board[c][r];
-        //System.out.printf("SOUTHEAST: matt[%d][%d] is %d\n",c,r,color);
         if (color == 0) {
             return false;
         }
         int y = c;
         int x = r;
         for (int k = 0; k < 4; k++) {
-            //System.out.printf("\tSOUTHEAST Checking: matt[%d][%d]\n",y,x);
             if ((y > 6) || (x > 5)) {
                 return false;
             }
@@ -122,14 +131,12 @@ public class GameLogic implements IGameLogic {
 
     private boolean hasFourSouthWest(int c, int r) {
         int color = this.board[c][r];
-        //System.out.printf("SOUTHWEST: matt[%d][%d] is %d\n",c,r,color);
         if (color == 0) {
             return false;
         }
         int y = c;
         int x = r;
         for (int k = 0; k < 4; k++) {
-            //System.out.printf("\tSOUTHWEST Checking: matt[%d][%d]\n",y,x);
             if ((y < 0) || (x > 5)) {
                 return false;
             }
@@ -144,19 +151,16 @@ public class GameLogic implements IGameLogic {
 
     private boolean hasFourSouth(int c, int r) {
         int color = this.board[c][r];
-        //System.out.printf("SOUTH: matt[%d][%d] is %d\n",c,r,color);
         if (color == 0) {
             return false;
         }
         for (int x = r; x < r + 4; x++) {
-            ///	System.out.printf("\tSOUTH Checking: matt[%d][%d]\n",c,x);
             if (x > 5) {
                 return false;
             } else if (this.board[c][x] != color) {
                 return false;
             }
         }
-        //	System.out.printf("FOURINAROW_SOUTH: %d\n",color);
         return true;
     }
 
@@ -165,7 +169,6 @@ public class GameLogic implements IGameLogic {
         for (int c = 0; c < this.x; c++) {
             for (int r = 0; r < this.y; r++) {
                 if (hasFourSouth(c, r)) {
-                    //System.out.printf("hasWinner is TRUE at mat[%d][%d] color: %d\n",c,r,matt[c][r]);
                     return this.board[c][r];
                 }
                 if (hasFourEast(c, r)) {
@@ -180,5 +183,16 @@ public class GameLogic implements IGameLogic {
             }
         }
         return 0;
+    }
+
+    public boolean isFull() {
+        for (int c = 0; c < 7; c++) {
+            for (int r = 0; r < 6; r++) {
+                if (this.board[c][r] == 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
