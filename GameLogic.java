@@ -30,13 +30,15 @@ public class GameLogic implements IGameLogic {
             }
         }
 //        this.board[1][2] = 1;
-        this.insertCoin(1, 2);
+        this.insertCoin(1, 1);
         this.insertCoin(2, 1);
-        this.insertCoin(1, 2);
+        this.insertCoin(1, 1);
         this.insertCoin(3, 1);
-        this.insertCoin(1, 2);
+        this.insertCoin(1, 1);
         this.insertCoin(4, 1);
+        this.insertCoin(1, 1);
         this.printBoard();
+        System.out.println("winner:" + this.hasWinner());
         System.exit(0);
         //TODO Write your implementation for this method
     }
@@ -48,8 +50,6 @@ public class GameLogic implements IGameLogic {
 
     public void insertCoin(int column, int playerID) {
         for (int i = 0; i < this.y; i++) {
-//            System.out.print(column + "," + i + "\n");
-//            System.out.println(this.board[column][i]);
             if (this.board[column][i] != 0) {
                 this.board[column][i - 1] = playerID;
                 break;
@@ -64,7 +64,6 @@ public class GameLogic implements IGameLogic {
                 }
             }
         }
-        //TODO Write your implementation for this method	
     }
 
     public int decideNextMove() {
@@ -80,5 +79,104 @@ public class GameLogic implements IGameLogic {
             System.out.print("\n");
         }
 
+    }
+
+    private boolean hasFourEast(int c, int r) {
+        int color = this.board[c][r];
+        if (color == 0) {
+            return false;
+        }
+        for (int x = c; x < c + 4; x++) {
+            if (x > 6) {
+                return false;
+            } else if (this.board[x][r] != color) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean hasFourSouthEast(int c, int r) {
+        int color = this.board[c][r];
+        //System.out.printf("SOUTHEAST: matt[%d][%d] is %d\n",c,r,color);
+        if (color == 0) {
+            return false;
+        }
+        int y = c;
+        int x = r;
+        for (int k = 0; k < 4; k++) {
+            //System.out.printf("\tSOUTHEAST Checking: matt[%d][%d]\n",y,x);
+            if ((y > 6) || (x > 5)) {
+                return false;
+            }
+            if (this.board[y][x] != color) {
+                return false;
+            }
+            y++;
+            x++;
+        }
+        return true;
+    }
+
+    private boolean hasFourSouthWest(int c, int r) {
+        int color = this.board[c][r];
+        //System.out.printf("SOUTHWEST: matt[%d][%d] is %d\n",c,r,color);
+        if (color == 0) {
+            return false;
+        }
+        int y = c;
+        int x = r;
+        for (int k = 0; k < 4; k++) {
+            //System.out.printf("\tSOUTHWEST Checking: matt[%d][%d]\n",y,x);
+            if ((y < 0) || (x > 5)) {
+                return false;
+            }
+            if (this.board[y][x] != color) {
+                return false;
+            }
+            y--;
+            x++;
+        }
+        return true;
+    }
+
+    private boolean hasFourSouth(int c, int r) {
+        int color = this.board[c][r];
+        //System.out.printf("SOUTH: matt[%d][%d] is %d\n",c,r,color);
+        if (color == 0) {
+            return false;
+        }
+        for (int x = r; x < r + 4; x++) {
+            ///	System.out.printf("\tSOUTH Checking: matt[%d][%d]\n",c,x);
+            if (x > 5) {
+                return false;
+            } else if (this.board[c][x] != color) {
+                return false;
+            }
+        }
+        //	System.out.printf("FOURINAROW_SOUTH: %d\n",color);
+        return true;
+    }
+
+    public int hasWinner() {
+        boolean hasFour = false;
+        for (int c = 0; c < this.x; c++) {
+            for (int r = 0; r < this.y; r++) {
+                if (hasFourSouth(c, r)) {
+                    //System.out.printf("hasWinner is TRUE at mat[%d][%d] color: %d\n",c,r,matt[c][r]);
+                    return this.board[c][r];
+                }
+                if (hasFourEast(c, r)) {
+                    return this.board[c][r];
+                }
+                if (hasFourSouthEast(c, r)) {
+                    return this.board[c][r];
+                }
+                if (hasFourSouthWest(c, r)) {
+                    return this.board[c][r];
+                }
+            }
+        }
+        return 0;
     }
 }
