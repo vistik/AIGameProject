@@ -1,8 +1,7 @@
-// http://www.overclockers.com/forums/showthread.php?t=554653
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import java.util.ArrayList;
+
+// http://www.overclockers.com/forums/showthread.php?t=554653
 public class GameLogic implements IGameLogic {
 
     private int x = 0;
@@ -18,28 +17,38 @@ public class GameLogic implements IGameLogic {
         this.x = x;
         this.y = y;
         this.playerID = playerID;
-//        int[][] board = ;
-        System.out.println(x);
-        System.out.println(y);
+////        int[][] board = ;
+//        System.out.println(x);
+//        System.out.println(y);
 
         this.board = new int[x][y];
 
-        for (int i = 0; i < x; i++) {
-            for (int j = 0; j < y; j++) {
-                this.board[i][j] = 0;
-            }
-        }
-//        this.board[1][2] = 1;
-        this.insertCoin(1, 2);
-        this.insertCoin(2, 1);
-        this.insertCoin(1, 2);
-        this.insertCoin(3, 1);
-        this.insertCoin(1, 1);
-        this.insertCoin(4, 2);
-        this.insertCoin(1, 1);
-        this.printBoard();
-        System.out.println("winner:" + this.hasWinner());
+//        for (int i = 0; i < x; i++) {
+//            for (int j = 0; j < y; j++) {
+//                this.board[i][j] = 0;
+//            }
+//        }
+//        this.board = insertCoin(1, 1, this.board);
+//        this.board = new int[x][y];
+//        this.board = insertCoin(2, 2, this.board);
+//        this.board = insertCoin(1, 1, this.board);
+//        this.board = insertCoin(4, 2, this.board);
+//        this.board = insertCoin(3, 1, this.board);
+//        this.board = insertCoin(6, 2, this.board);
+//        this.board = insertCoin(1, 1, this.board);
+//        this.printBoard();
+        this.getPossibleActions(2,this.board);
+//        this.printBoard(insertCoin(0, 1,this.board));
+//        this.printBoard(insertCoin(5, 1,this.board));
+//        for (int[][] ises : states) {
+//            System.out.println("");
+//            this.printBoard(ises);
+//        }
+//        this.printBoard();
         System.exit(0);
+                
+        System.out.println("winner:" + this.hasWinner());
+//        System.exit(0);
         //TODO Write your implementation for this method
     }
 
@@ -53,8 +62,8 @@ public class GameLogic implements IGameLogic {
                 return Winner.PLAYER2;
 
         }
-        
-        if (this.isFull()){
+
+        if (this.isFull()) {
             return Winner.TIE;
         }
         return Winner.NOT_FINISHED;
@@ -64,30 +73,125 @@ public class GameLogic implements IGameLogic {
         for (int i = 0; i < this.y; i++) {
             if (this.board[column][i] != 0) {
                 this.board[column][i - 1] = playerID;
-                break;
+                return;
             }
 
             if (this.y - 1 == i) {
                 if (this.board[column][i] == 0) {
                     this.board[column][i] = playerID;
-                } else {
-                    System.err.println("Move not allowed");
-                    System.exit(1);
+                    return;
                 }
+//                else {
+//                    System.err.println("Move not allowed 1");
+//                    System.exit(1);
+//                }
             }
         }
     }
 
+    public int[][] insertCoin(int column, int playerID, int[][] state) {
+        System.out.println("insertCoin, called with:");
+        this.printBoard(state);
+        System.out.println("");
+        for (int i = 0; i < this.y; i++) {
+            if (state[column][i] != 0) {
+                state[column][i - 1] = playerID;
+                return state;
+            }
+            if (this.y - 1 == i) {
+                if (state[column][i] == 0) {
+                    state[column][i] = playerID;
+                    return state;
+                }    
+            }
+        }
+        return state;
+    }
+
+    public void getPossibleActions(int playerID, int[][] s) {
+        for (int i = 0; i < this.x; i++) {
+            System.out.println("i:" + i);
+            System.out.println("");
+            this.printBoard(insertCoin(i, playerID, s));
+            
+            System.out.println("");
+        }
+    }
+
     public int decideNextMove() {
-        //TODO Write your implementation for this method
-        //HEr skal ske noget!!!
+
         return 0;
+    }
+
+    public int maxValue(int[][] state) {
+        System.out.println("Max turn:");
+        this.printBoard();
+        int mValue;
+        switch (this.gameFinished()) {
+            case TIE:
+                return 0;
+            case PLAYER1:
+                return 1;
+            case PLAYER2:
+                return -1;
+        }
+        mValue = Integer.MIN_VALUE;
+        for (int i = 0; i < state.length - 1; i++) {
+            if (state[i][0] == 0) {
+                int mV = minValue(insertCoin(i, 1, state));
+                if (mValue < mV) {
+                    mValue = mV;
+                }
+                //mValue = Max(mValue, minValue(insertCoin(i, 2, state))
+                //Result skal s�tte en coin i den p�g�ldende columne i
+            }
+        }
+        System.out.println("Choice:" + mValue);
+        return mValue;
+    }
+
+    public int minValue(int[][] state) {
+        System.out.println("Min turn:");
+        this.printBoard();
+        int mValue;
+        switch (this.gameFinished()) {
+            case TIE:
+                return 0;
+            case PLAYER1:
+                return 1;
+            case PLAYER2:
+                return -1;
+        }
+
+        mValue = Integer.MAX_VALUE;
+        for (int i = 0; i < state.length - 1; i++) {
+            if (state[i][0] == 0) {
+                int mV = maxValue(insertCoin(i, 2, state));
+                if (mValue > mV) {
+                    mValue = mV;
+                }
+                //mValue = MIN(mValue, maxValue(insertCoin(i, 2, state))
+                //Result skal s�tte en coin i den p�g�ldende columne i
+            }
+        }
+        System.out.println("Choice:" + mValue);
+        return mValue;
     }
 
     public void printBoard() {
         for (int j = 0; j < this.y; j++) {
             for (int i = 0; i < this.x; i++) {
                 System.out.print(this.board[i][j] + " ");
+            }
+            System.out.print("\n");
+        }
+
+    }
+
+    public void printBoard(int[][] state) {
+        for (int j = 0; j < this.y; j++) {
+            for (int i = 0; i < this.x; i++) {
+                System.out.print(state[i][j] + " ");
             }
             System.out.print("\n");
         }
