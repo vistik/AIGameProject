@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 // http://www.overclockers.com/forums/showthread.php?t=554653
 public class GameLogic implements IGameLogic {
@@ -89,8 +90,10 @@ public class GameLogic implements IGameLogic {
         }
     }
 
-    public int[][] insertCoin(int column, int playerID, int[][] state) {
+    public int[][] insertCoin(int column, int playerID, int[][] s) {
         System.out.println("insertCoin, called with:");
+        int[][] state = null;
+        state = Arrays.copyOf(s, s.length);
         this.printBoard(state);
         System.out.println("");
         for (int i = 0; i < this.y; i++) {
@@ -109,11 +112,12 @@ public class GameLogic implements IGameLogic {
     }
 
     public void getPossibleActions(int playerID, int[][] s) {
+    	
         for (int i = 0; i < this.x; i++) {
+        	int[][] nyS = this.copyDoblAr(s);
             System.out.println("i:" + i);
             System.out.println("");
-            this.printBoard(insertCoin(i, playerID, s));
-            
+            this.printBoard(insertCoin(i, playerID, nyS));
             System.out.println("");
         }
     }
@@ -299,4 +303,16 @@ public class GameLogic implements IGameLogic {
         }
         return true;
     }
+    
+    public int[][] copyDoblAr(int[][] org){
+    	int[][] copy = new int[org.length][org[0].length];
+    		for(int y=0;y<org.length;y++){
+    			for(int x=0;x<org[y].length;x++){
+    				copy[y][x] = org[y][x];
+    			}
+    			
+    		}
+    	return copy;
+    }
+    
 }
