@@ -43,6 +43,10 @@ public class GameLogic implements IGameLogic {
 //        insertCoin(2, 2);
 //        insertCoin(3, 1);
 //        
+//        for (int i = 0; i < 42; i++) {
+//            (i ^ 7);
+            System.out.println(Math.pow(16,7));
+//        }
 //        this.printBoard(board);
 //        this.hasWinner(this.board);
         System.exit(0);
@@ -342,8 +346,8 @@ public class GameLogic implements IGameLogic {
     }
 
     public boolean isFull(int[][] state) {
-        for (int c = 0; c < 7; c++) {
-            for (int r = 0; r < 6; r++) {
+        for (int c = 0; c < this.x; c++) {
+            for (int r = 0; r < this.y; r++) {
                 if (state[c][r] == 0) {
                     return false;
                 }
