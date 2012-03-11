@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 
 // http://www.overclockers.com/forums/showthread.php?t=554653
 public class GameLogic implements IGameLogic {
@@ -35,11 +37,11 @@ public class GameLogic implements IGameLogic {
 //		insertCoin(1, 2);
 //		insertCoin(1, 1);
 //		insertCoin(1, 2);
-//
+
 //		insertCoin(2, 1);
 //		insertCoin(2, 2);
 //		insertCoin(2, 1);
-//
+
 //		insertCoin(3, 2);
 		//
 		// insertCoin(1, 2);
@@ -67,21 +69,21 @@ public class GameLogic implements IGameLogic {
 		// insertCoin(1, 1);
 		// insertCoin(2, 2);
 		// insertCoin(3, 1);
-		insertCoin(this.minmaxdecision(1), 1);
-		insertCoin(this.minmaxdecision(2), 2);
-		insertCoin(this.minmaxdecision(1), 1);
-		insertCoin(this.minmaxdecision(2), 2);
-		this.printBoard(this.board);
-		System.out.println("winner:" + this.hasWinner(this.board));
+//		insertCoin(this.minmaxdecision(1), 1);
+//		insertCoin(this.minmaxdecision(2), 2);
+//		insertCoin(this.minmaxdecision(1), 1);
+//		insertCoin(this.minmaxdecision(2), 2);
+//		this.printBoard(this.board);
+//		System.out.println("winner:" + this.hasWinner(this.board));
 
 		// for (int i = 0; i < 42; i++) {
 		// (i ^ 7);
 		// System.out.println(Math.pow(16,7));
 		// }
 
-		System.exit(0);
+//		System.exit(0);
 
-		System.out.println("winner:" + this.hasWinner(this.board));
+//		System.out.println("winner:" + this.hasWinner(this.board));
 	}
 
 	public Winner gameFinished() {
@@ -172,13 +174,18 @@ public class GameLogic implements IGameLogic {
 	}
 
 	public int decideNextMove() {
-
-		return 0;
+		System.out.println("Starts on finding move");
+		Calendar beforeDecision = Calendar.getInstance();
+		int nextMov = this.minmaxdecision(9);
+		Calendar afterDecision = Calendar.getInstance();
+//		Long timeSpend = afterDecision-beforeDecision;
+		System.out.println();
+		return nextMov;
 	}
 
-	public int minmaxdecision(int playerID) {
+	public int minmaxdecision(int depth) {
 		ArrayList<int[][]> actions = null;
-		actions = this.getPossibleActions(playerID, this.board);
+		actions = this.getPossibleActions(this.playerID, this.board);
 		// for (int[][] a : actions) {
 		// this.printBoard(a);
 		// }
@@ -189,7 +196,7 @@ public class GameLogic implements IGameLogic {
 		int[][] mAction = null;
 		for (int[][] a : actions) {
 			if (a != null) {
-				mV = minValue(a);
+				mV = minValue(a,depth);
 				if (mValue < mV) {
 					mValue = mV;
 					mAction = a;
@@ -206,7 +213,7 @@ public class GameLogic implements IGameLogic {
 		return primI;
 	}
 
-	public int maxValue(int[][] state) {
+	public int maxValue(int[][] state, int level) {
 //		System.out.println("Max turn:");
 //		this.printBoard(state);
 		int mValue;
@@ -217,6 +224,11 @@ public class GameLogic implements IGameLogic {
 			return 1;
 		case PLAYER2:
 			return -1;
+		}
+		if(level==0){
+			return 0;
+		}else{
+			level--;
 		}
 		mValue = Integer.MIN_VALUE;
 		// for (int i = 0; i < state.length - 1; i++) {
@@ -233,7 +245,7 @@ public class GameLogic implements IGameLogic {
 		actions = this.getPossibleActions(1, state);
 		for (int[][] a : actions) {
 			if (a != null) {
-				int mV = minValue(a);
+				int mV = minValue(a,level);
 				if (mValue < mV) {
 					mValue = mV;
 				}
@@ -246,7 +258,7 @@ public class GameLogic implements IGameLogic {
 		return mValue;
 	}
 
-	public int minValue(int[][] state) {
+	public int minValue(int[][] state, int level) {
 //		System.out.println("Min turn:");
 //		this.printBoard(state);
 		int mValue;
@@ -257,6 +269,11 @@ public class GameLogic implements IGameLogic {
 			return 1;
 		case PLAYER2:
 			return -1;
+		}
+		if(level==0){
+			return 0;
+		}else{
+			level--;
 		}
 
 		mValue = Integer.MAX_VALUE;
@@ -274,7 +291,7 @@ public class GameLogic implements IGameLogic {
 		actions = this.getPossibleActions(2, state);
 		for (int[][] a : actions) {
 			if (a != null) {
-				int mV = maxValue(a);
+				int mV = maxValue(a,level);
 				if (mValue > mV) {
 					mValue = mV;
 				}
