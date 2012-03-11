@@ -25,7 +25,26 @@ public class GameLogic implements IGameLogic {
 //            this.printBoard(ises);
 //            System.out.println("");
 //        
-        this.minmaxdecision(1);
+//        this.minmaxdecision(1);
+//        System.out.println(this.getRandomMove());
+//        insertCoin(1, 1);
+//        insertCoin(2, 2);
+//        insertCoin(3, 1);
+//        insertCoin(0, 2);
+//        insertCoin(1, 1);
+//        insertCoin(2, 2);
+//        insertCoin(3, 1);
+//        insertCoin(0, 2);
+//        insertCoin(1, 1);
+//        insertCoin(2, 2);
+//        insertCoin(3, 1);
+//        insertCoin(0, 2);
+//        insertCoin(1, 1);
+//        insertCoin(2, 2);
+//        insertCoin(3, 1);
+//        
+//        this.printBoard(board);
+//        this.hasWinner(this.board);
         System.exit(0);
 
         System.out.println("winner:" + this.hasWinner(this.board));
@@ -68,6 +87,9 @@ public class GameLogic implements IGameLogic {
     }
 
     public void insertCoin(int column, int playerID) {
+        if (this.board[column][0] != 0){
+            return;
+        }
         for (int i = 0; i < this.y; i++) {
             if (this.board[column][i] != 0) {
                 this.board[column][i - 1] = playerID;
@@ -245,6 +267,9 @@ public class GameLogic implements IGameLogic {
         int y = c;
         int x = r;
         for (int k = 0; k < 4; k++) {
+            if (y > this.y -1 || x > this.x -1){
+                return false;
+            }
             if ((y > 6) || (x > 5)) {
                 return false;
             }
@@ -283,6 +308,9 @@ public class GameLogic implements IGameLogic {
             return false;
         }
         for (int x = r; x < r + 4; x++) {
+            if (x > this.x -1){
+                return false;
+            }
             if (x > 5) {
                 return false;
             } else if (state[c][x] != color) {
