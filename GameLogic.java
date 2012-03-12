@@ -47,7 +47,7 @@ public class GameLogic implements IGameLogic {
 //
 //
 //        insertCoin(1, 2);
-//        insertCoin(1, 2);
+//        insertCoin(1, 1);
 //        insertCoin(1, 1);
 //        insertCoin(1, 1);
 //
@@ -55,8 +55,14 @@ public class GameLogic implements IGameLogic {
 //        insertCoin(2, 2);
 //        insertCoin(2, 2);
 //
+//        insertCoin(5, 1);
+//        insertCoin(6, 2);
+//        insertCoin(6, 2);
+//
 //
 //        insertCoin(3, 2);
+//        this.printBoard(this.board);
+//        heuristicsSouthWest(1, board);
         //
         // insertCoin(this.minmaxdecision(-1,2), 2);
         // // insertCoin(this.minmaxdecision(-1,1), 1);
@@ -65,7 +71,7 @@ public class GameLogic implements IGameLogic {
         // this.printBoard(this.board);
         // System.out.println("winner:" + this.hasWinner(this.board));
         // //
-        // System.exit(0);
+//        System.exit(0);
         // );
 //        this.printBoard(board);
 //        System.out.println("this.heuristicHorizontal(1, this.board)");
@@ -203,12 +209,12 @@ public class GameLogic implements IGameLogic {
         System.out.println("Starts on finding move");
         Stopwatch st = new Stopwatch();
         st.start();
-        int nextMov = this.minmaxdecision(6, this.playerID);
+        int nextMov = this.minmaxdecision(5, this.playerID);
         st.stop();
         System.out.println("secs: " + st.getElapsedTimeSecs());
         System.out.println("Memory:" + this.memory.size());
         System.out.println("New Memory:" + (this.memory.size() - oldmem));
-        
+
         // System.out.println();
         return nextMov;
     }
@@ -472,8 +478,8 @@ public class GameLogic implements IGameLogic {
         } else {
             opponent = 1;
         }
-        int us = this.heuristicVertical(playerID, state) + this.heuristicHorizontal(playerID, state);
-        int them = this.heuristicVertical(opponent, state) + this.heuristicHorizontal(opponent, state);
+        int us = this.heuristicVertical(playerID, state) + this.heuristicHorizontal(playerID, state) + this.heuristicsSouthEast(playerID, state) + this.heuristicsSouthWest(playerID, state);
+        int them = this.heuristicVertical(opponent, state) + this.heuristicHorizontal(opponent, state)+ this.heuristicsSouthEast(opponent, state) + this.heuristicsSouthWest(opponent, state);
         return us + them;
     }
 
@@ -508,11 +514,118 @@ public class GameLogic implements IGameLogic {
 
         return value * factor;
     }
-    
-    public void heuristicsSouthEast(int playerID, int[][] state){
-        for(int y = this.y; y >= 0; y--){
-            
+
+    public int heuristicsSouthWest(int playerID, int[][] state) {
+        int value = 0;
+        for (int z = 0; z < this.x; z++) {
+            int x = z;
+            int y = 0;
+            String hash = "";
+            do {
+                hash += state[x][y];
+                x--;
+                y++;
+
+            } while (x >= 0 && y < this.y);
+//            System.out.println(hash);
+            Iterator it = this.patterns.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pairs = (Map.Entry) it.next();
+
+                String key = (String) pairs.getKey();
+                key = key.replace("1", "" + playerID + "");
+                if (hash.indexOf(key) >= 0) {
+                    value += (Integer) pairs.getValue();
+                }
+            }
         }
+        for (int z = 1; z < this.y; z++) {
+            int x = this.x - 1;
+            int y = z;
+            String hash = "";
+            do {
+                hash += state[x][y];
+//                System.out.println("x:" + x + " y: " + y);
+                x--;
+                y++;
+
+            } while (x >= 0 && y < this.y);
+//            System.out.println(hash);
+            Iterator it = this.patterns.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pairs = (Map.Entry) it.next();
+
+                String key = (String) pairs.getKey();
+                key = key.replace("1", "" + playerID + "");
+                if (hash.indexOf(key) >= 0) {
+                    value += (Integer) pairs.getValue();
+                }
+            }
+        }
+        int factor;
+        if (playerID == 2) {
+            factor = -1;
+        } else {
+            factor = 1;
+        }
+
+        return value * factor;
+    }
+
+    public int heuristicsSouthEast(int playerID, int[][] state) {
+        int value = 0;
+        for (int z = this.y - 1; z >= 0; z--) {
+            int x = 0;
+            int y = z;
+            String hash = "";
+            do {
+                hash += state[x][y];
+                x++;
+                y++;
+
+            } while (x < this.x && y < this.y);
+//            System.out.println(hash);
+            Iterator it = this.patterns.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pairs = (Map.Entry) it.next();
+
+                String key = (String) pairs.getKey();
+                key = key.replace("1", "" + playerID + "");
+                if (hash.indexOf(key) >= 0) {
+                    value += (Integer) pairs.getValue();
+                }
+            }
+        }
+        for (int z = 1; z < this.x; z++) {
+            int x = z;
+            int y = 0;
+            String hash = "";
+            do {
+                hash += state[x][y];
+                x++;
+                y++;
+
+            } while (x < this.x && y < this.y);
+//            System.out.println(hash);
+            Iterator it = this.patterns.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pairs = (Map.Entry) it.next();
+
+                String key = (String) pairs.getKey();
+                key = key.replace("1", "" + playerID + "");
+                if (hash.indexOf(key) >= 0) {
+                    value += (Integer) pairs.getValue();
+                }
+            }
+        }
+        int factor;
+        if (playerID == 2) {
+            factor = -1;
+        } else {
+            factor = 1;
+        }
+
+        return value * factor;
     }
 
     public void printBoard(int[][] state) {
