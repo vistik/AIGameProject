@@ -1,3 +1,4 @@
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -7,445 +8,534 @@ import java.util.HashMap;
 // http://www.overclockers.com/forums/showthread.php?t=554653
 public class GameLogic implements IGameLogic {
 
-	private int x = 0;
-	private int y = 0;
-	private int playerID;
-	private int[][] board;
-	private HashMap<String, Integer> memory;
+    private int x = 0;
+    private int y = 0;
+    private int playerID;
+    private int[][] board;
+    private int[] scale;
+    private HashMap<String, Integer> memory;
 
-	public GameLogic() {
-		// TODO Write your implementation for this method
-	}
+    public GameLogic() {
+        // TODO Write your implementation for this method
+    }
 
-	public void initializeGame(int x, int y, int playerID) {
-		this.x = x;
-		this.y = y;
-		this.playerID = playerID;
-		this.board = new int[x][y];
-		this.memory = new HashMap<String, Integer>();
-		// System.out.println(playerID);
-		//
-		// insertCoin(0, 2);
-		// insertCoin(0, 2);
-		// insertCoin(0, 1);
-		// insertCoin(0, 2);
-		//
-		//
-		// insertCoin(1, 2);
-		// insertCoin(1, 1);
-		// insertCoin(1, 1);
-		// insertCoin(1, 1);
-		//
-		// insertCoin(2, 2);
-		// insertCoin(2, 2);
-		// insertCoin(2, 1);
-		//
-		//
-		// insertCoin(3, 1);
-		//
-		// insertCoin(this.minmaxdecision(-1,2), 2);
-		// // insertCoin(this.minmaxdecision(-1,1), 1);
-		// // insertCoin(this.minmaxdecision(-1,2), 2);
-		// // insertCoin(this.minmaxdecision(-1,1), 1);
-		// this.printBoard(this.board);
-		// System.out.println("winner:" + this.hasWinner(this.board));
-		// //
-		// System.exit(0);
-		// );
+    public void initializeGame(int x, int y, int playerID) {
+        this.x = x;
+        this.y = y;
+        this.playerID = playerID;
+        this.board = new int[x][y];
+        this.memory = new HashMap<String, Integer>();
+        this.scale = new int[5];
+        this.scale[0] = 0;
+        this.scale[1] = 1;
+        this.scale[2] = 3;
+        this.scale[3] = 9;
+        this.scale[4] = 1000;
+        
+        // System.out.println(playerID);
+        //
+        insertCoin(0, 1);
+        insertCoin(0, 1);
+        insertCoin(0, 1);
+        insertCoin(0, 1);
 
-	}
 
-	public String getHash(int[][] state) {
-		if (state == null) {
-			System.out.println("Det fejer");
-		}
-		String hash = "";
-		for (int j = 0; j < this.y; j++) {
-			for (int i = 0; i < this.x; i++) {
-				hash = hash + "" + state[i][j] + "";
-			}
-		}
-		return hash;
-	}
+        insertCoin(1, 1);
+        insertCoin(1, 1);
+        insertCoin(1, 1);
+        insertCoin(1, 1);
 
-	public Winner gameFinished() {
+        insertCoin(2, 1);
+        insertCoin(2, 1);
+        insertCoin(2, 1);
 
-		int winner = this.hasWinner(this.board);
-		switch (winner) {
-		case 1:
-			return Winner.PLAYER1;
 
-		case 2:
-			return Winner.PLAYER2;
+        insertCoin(3, 1);
+        //
+        // insertCoin(this.minmaxdecision(-1,2), 2);
+        // // insertCoin(this.minmaxdecision(-1,1), 1);
+        // // insertCoin(this.minmaxdecision(-1,2), 2);
+        // // insertCoin(this.minmaxdecision(-1,1), 1);
+        // this.printBoard(this.board);
+        // System.out.println("winner:" + this.hasWinner(this.board));
+        // //
+        // System.exit(0);
+        // );
+        this.printBoard(board);
+        System.out.println("this.heuristicHorizontal(1, this.board)");
+        this.heuristicHorizontal(1, this.board);
+        
+//        System.out.println("this.heuristicHorizontal(2, this.board)");
+//        this.heuristicHorizontal(2, this.board);
+        
+        System.out.println("this.heuristicVertical(1, this.board)");
+        this.heuristicVertical(1, this.board);
+        
+//        System.out.println("this.heuristicVertical(2, this.board)");
+//        this.heuristicVertical(2, this.board);
+        System.exit(0);
+    }
 
-		}
+    public String getHash(int[][] state) {
+        if (state == null) {
+            System.out.println("Det fejer");
+        }
+        String hash = "";
+        for (int j = 0; j < this.y; j++) {
+            for (int i = 0; i < this.x; i++) {
+                hash = hash + "" + state[i][j] + "";
+            }
+        }
+        return hash;
+    }
 
-		if (this.isFull(this.board)) {
-			return Winner.TIE;
-		}
-		return Winner.NOT_FINISHED;
-	}
+    public Winner gameFinished() {
 
-	public Winner gameFinished(int[][] state) {
+        int winner = this.hasWinner(this.board);
+        switch (winner) {
+            case 1:
+                return Winner.PLAYER1;
 
-		int winner = this.hasWinner(state);
-		switch (winner) {
-		case 1:
-			return Winner.PLAYER1;
+            case 2:
+                return Winner.PLAYER2;
 
-		case 2:
-			return Winner.PLAYER2;
+        }
 
-		}
+        if (this.isFull(this.board)) {
+            return Winner.TIE;
+        }
+        return Winner.NOT_FINISHED;
+    }
 
-		if (this.isFull(state)) {
-			return Winner.TIE;
-		}
-		return Winner.NOT_FINISHED;
-	}
+    public Winner gameFinished(int[][] state) {
 
-	public void insertCoin(int column, int playerID) {
-		if (this.board[column][0] != 0) {
-			return;
-		}
-		for (int i = 0; i < this.y; i++) {
-			if (this.board[column][i] != 0) {
-				this.board[column][i - 1] = playerID;
-				return;
-			}
+        int winner = this.hasWinner(state);
+        switch (winner) {
+            case 1:
+                return Winner.PLAYER1;
 
-			if (this.y - 1 == i) {
-				if (this.board[column][i] == 0) {
-					this.board[column][i] = playerID;
-					return;
-				}
-			}
-		}
-	}
+            case 2:
+                return Winner.PLAYER2;
 
-	public int[][] insertCoin(int column, int playerID, int[][] state) {
-		if (state[column][0] != 0) {
-			return null;
-		}
-		for (int i = 0; i < this.y; i++) {
-			if (state[column][i] != 0) {
-				state[column][i - 1] = playerID;
-				return state;
-			}
-			if (this.y - 1 == i) {
-				if (state[column][i] == 0) {
-					state[column][i] = playerID;
-					return state;
-				}
-			}
-		}
-		return state;
-	}
+        }
 
-	public int decideNextMove() {
-		System.out.println("Starts on finding move");
-		Stopwatch st = new Stopwatch();
-		st.start();
-		int nextMov = this.minmaxdecision(-1, this.playerID);
-		st.stop();
-		System.out.println(st.getElapsedTimeSecs());
+        if (this.isFull(state)) {
+            return Winner.TIE;
+        }
+        return Winner.NOT_FINISHED;
+    }
 
-		// System.out.println();
-		return nextMov;
-	}
+    public void insertCoin(int column, int playerID) {
+        if (this.board[column][0] != 0) {
+            return;
+        }
+        for (int i = 0; i < this.y; i++) {
+            if (this.board[column][i] != 0) {
+                this.board[column][i - 1] = playerID;
+                return;
+            }
 
-	public ArrayList<int[][]> getPossibleActions(int playerID, int[][] state) {
-		ArrayList<int[][]> actions = new ArrayList<int[][]>();
-		int[][] newState = null;
-		for (int i = 0; i < this.x; i++) {
-			int[][] s = this.copyDoblAr(state);
-			newState = insertCoin(i, playerID, s);
+            if (this.y - 1 == i) {
+                if (this.board[column][i] == 0) {
+                    this.board[column][i] = playerID;
+                    return;
+                }
+            }
+        }
+    }
 
-			actions.add(newState);
+    public int[][] insertCoin(int column, int playerID, int[][] state) {
+        if (state[column][0] != 0) {
+            return null;
+        }
+        for (int i = 0; i < this.y; i++) {
+            if (state[column][i] != 0) {
+                state[column][i - 1] = playerID;
+                return state;
+            }
+            if (this.y - 1 == i) {
+                if (state[column][i] == 0) {
+                    state[column][i] = playerID;
+                    return state;
+                }
+            }
+        }
+        return state;
+    }
 
-		}
-		return actions;
-	}
+    public int decideNextMove() {
+        System.out.println("Starts on finding move");
+        Stopwatch st = new Stopwatch();
+        st.start();
+        int nextMov = this.minmaxdecision(-1, this.playerID);
+        st.stop();
+        System.out.println(st.getElapsedTimeSecs());
 
-	public int minmaxdecision(int depth, int playerID) {
-		ArrayList<int[][]> actions = null;
-		actions = this.getPossibleActions(playerID, this.board);
-		// for (int[][] a : actions) {
-		// this.printBoard(a);
-		// }
-		int mValue = 0;
-		if (this.playerID == 1) {
-			mValue = Integer.MIN_VALUE;
-		} else {
-			mValue = Integer.MAX_VALUE;
-		}
+        // System.out.println();
+        return nextMov;
+    }
 
-		int mV;
-		int i = 0;
-		int primI = 0;
-		int[][] mAction = null;
-		for (int[][] a : actions) {
-			if (a != null) {
-				if (this.playerID == 1) {
-					mV = minValue(a, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
-					if (mValue < mV) {
-						mValue = mV;
-						mAction = a;
-						primI = i;
-					}
-				} else {
-					mV = maxValue(a, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
-					if (mValue > mV) {
-						mValue = mV;
-						mAction = a;
-						primI = i;
-					}
-				}
-				// this.printBoard(a);
-				// System.out.println(mV);
-			}
-			i++;
-		}
-		System.out.println(primI);
-		System.out.println("ngoeg");
-		this.printBoard(mAction);
-		return primI;
-	}
+    public ArrayList<int[][]> getPossibleActions(int playerID, int[][] state) {
+        ArrayList<int[][]> actions = new ArrayList<int[][]>();
+        int[][] newState = null;
+        for (int i = 0; i < this.x; i++) {
+            int[][] s = this.copyDoblAr(state);
+            newState = insertCoin(i, playerID, s);
 
-	public int maxValue(int[][] state, int level, int max,int min) {
-		System.out.println(memory.size());
-		try {
-			int v = ((Integer) memory.get(this.getHash(state))).intValue();
-			return v;
-		} catch (Exception e) {
-		}
-		int mValue;
-		switch (this.gameFinished(state)) {
-		case TIE:
-			return 0;
-		case PLAYER1:
-			return 1;
-		case PLAYER2:
-			return -1;
-		}
+            actions.add(newState);
+
+        }
+        return actions;
+    }
+
+    public int minmaxdecision(int depth, int playerID) {
+        ArrayList<int[][]> actions = null;
+        actions = this.getPossibleActions(playerID, this.board);
+        // for (int[][] a : actions) {
+        // this.printBoard(a);
+        // }
+        int mValue = 0;
+        if (this.playerID == 1) {
+            mValue = Integer.MIN_VALUE;
+        } else {
+            mValue = Integer.MAX_VALUE;
+        }
+
+        int mV;
+        int i = 0;
+        int primI = 0;
+        int[][] mAction = null;
+        for (int[][] a : actions) {
+            if (a != null) {
+                if (this.playerID == 1) {
+                    mV = minValue(a, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    if (mValue < mV) {
+                        mValue = mV;
+                        mAction = a;
+                        primI = i;
+                    }
+                } else {
+                    mV = maxValue(a, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    if (mValue > mV) {
+                        mValue = mV;
+                        mAction = a;
+                        primI = i;
+                    }
+                }
+                // this.printBoard(a);
+                // System.out.println(mV);
+            }
+            i++;
+        }
+        System.out.println(primI);
+        System.out.println("ngoeg");
+        this.printBoard(mAction);
+        return primI;
+    }
+
+    public int maxValue(int[][] state, int level, int max, int min) {
+        System.out.println(memory.size());
+        try {
+            int v = ((Integer) memory.get(this.getHash(state))).intValue();
+            return v;
+        } catch (Exception e) {
+        }
+        int mValue;
+        switch (this.gameFinished(state)) {
+            case TIE:
+                return 0;
+            case PLAYER1:
+                return 1;
+            case PLAYER2:
+                return -1;
+        }
 //		if (level == 0) {
 //			return 0;
 //		} else {
 //			level--;
 //		}
-		mValue = Integer.MIN_VALUE;
-		ArrayList<int[][]> actions = null;
-		actions = this.getPossibleActions(1, state);
-		int[][] primI = null;
-		for (int[][] a : actions) {
-			if (a != null) {
-				int mV = minValue(a, level, max, min);
-				
-				if (mValue < mV) {
-					mValue = mV;
-					primI = a;
-				}
+        mValue = Integer.MIN_VALUE;
+        ArrayList<int[][]> actions = null;
+        actions = this.getPossibleActions(1, state);
+        int[][] primI = null;
+        for (int[][] a : actions) {
+            if (a != null) {
+                int mV = minValue(a, level, max, min);
 
-				if(mValue>=min){
-					this.memory.put(this.getHash(a), mValue);
-					return mValue;
-				}
-				max = Math.max(max, mValue);
+                if (mValue < mV) {
+                    mValue = mV;
+                    primI = a;
+                }
+
+                if (mValue >= min) {
+                    this.memory.put(this.getHash(a), mValue);
+                    return mValue;
+                }
+                max = Math.max(max, mValue);
 
 
 
-			}
-		}
-		if (primI != null) {
-			this.memory.put(this.getHash(primI), mValue);
-		}
-		return mValue;
-	}
+            }
+        }
+        if (primI != null) {
+            this.memory.put(this.getHash(primI), mValue);
+        }
+        return mValue;
+    }
 
-	public int minValue(int[][] state, int level, int max,int min) {
-		try {
-			int v = ((Integer) memory.get(this.getHash(state))).intValue();
-			return v;
-		} catch (Exception e) {
-		}
-		int mValue;
-		switch (this.gameFinished(state)) {
-		case TIE:
-			return 0;
-		case PLAYER1:
-			return 1;
-		case PLAYER2:
-			return -1;
-		}
+    public int minValue(int[][] state, int level, int max, int min) {
+        try {
+            int v = ((Integer) memory.get(this.getHash(state))).intValue();
+            return v;
+        } catch (Exception e) {
+        }
+        int mValue;
+        switch (this.gameFinished(state)) {
+            case TIE:
+                return 0;
+            case PLAYER1:
+                return 1;
+            case PLAYER2:
+                return -1;
+        }
 //		if (level == 0) {
 //			return 0;
 //		} else {
 //			level--;
 //		}
 
-		mValue = Integer.MAX_VALUE;
+        mValue = Integer.MAX_VALUE;
 
-		ArrayList<int[][]> actions = null;
-		actions = this.getPossibleActions(2, state);
-		int[][] primI = null;
-		for (int[][] a : actions) {
-			if (a != null) {
-				int mV = maxValue(a, level,  max, min);
-				if (mValue > mV) {
-					mValue = mV;
-					primI = a;
-				}
-				if(mValue<=max){
-					this.memory.put(this.getHash(a), mValue);
-					return mValue;
-				}
-				min = Math.min(min, mValue);
-			}
+        ArrayList<int[][]> actions = null;
+        actions = this.getPossibleActions(2, state);
+        int[][] primI = null;
+        for (int[][] a : actions) {
+            if (a != null) {
+                int mV = maxValue(a, level, max, min);
+                if (mValue > mV) {
+                    mValue = mV;
+                    primI = a;
+                }
+                if (mValue <= max) {
+                    this.memory.put(this.getHash(a), mValue);
+                    return mValue;
+                }
+                min = Math.min(min, mValue);
+            }
 
-		}
-		if (primI != null) {
-			this.memory.put(this.getHash(primI), mValue);
-		}
-		return mValue;
-	}
+        }
+        if (primI != null) {
+            this.memory.put(this.getHash(primI), mValue);
+        }
+        return mValue;
+    }
 
-	public void printBoard(int[][] state) {
-		if (state == null) {
-			System.out.println("nUL!LL!L");
-			return;
-		}
+    public int heuristicHorizontal(int playerID, int[][] state) {
+        int factor;
+        if (playerID == 2){
+            factor = -1;
+        }else{
+            factor = 1;
+        }
+        int streak = 0;
+        int[] streaks = new int[4];
+        for (int j = 0; j < this.y; j++) {
+            for (int i = 0; i < this.x; i++) {
+                System.out.print(state[i][j]+ " ");
+                if (state[i][j] == playerID) {
+                    streak++;
+                } else {
+                    streaks[streak]++;
+                    streak = 0;
+                }
 
-		for (int j = 0; j < this.y; j++) {
-			for (int i = 0; i < this.x; i++) {
-				System.out.print(state[i][j] + " ");
-			}
-			System.out.print("\n");
-		}
+            }
+            System.out.print("\n");
+        }
+        int value = 0;
+        int a = 0;
+        for (int i : streaks) {
+            System.out.println(i);
+            value = value + (i * this.scale[a]);
+            a++;
+        }
+        value = value * factor;
+        System.out.println(value);
+        return value;
+    }
+    
+        public int heuristicVertical(int playerID, int[][] state) {
+        int factor;
+        if (playerID == 2){
+            factor = -1;
+        }else{
+            factor = 1;
+        }
+        int streak = 0;
+        int[] streaks = new int[4];
+        for (int j = 0; j < this.y; j++) {
+            for (int i = 0; i < this.x; i++) {
+                System.out.print(state[i][j] + " ");
+                if (state[j][i] == playerID) {
+                    streak++;
+                } else {
+                    streaks[streak]++;
+                    streak = 0;
+                }
 
-	}
+            }
+            System.out.print("\n");
+        }
+        System.out.println(streaks);
+        int value = 0;
+        int a = 0;
+        for (int i : streaks) {
+            System.out.println(i);
+            value = value + (i * this.scale[a]);
+            a++;
+        }
+        value = value * factor;
+        System.out.println(value);
+        return value;
+    }
 
-	private boolean hasFourEast(int c, int r, int[][] state) {
-		int color = state[c][r];
-		if (color == 0) {
-			return false;
-		}
-		for (int x = c; x < c + 4; x++) {
-			if (x > this.x - 1) {
-				return false;
-			}
-			if (x > 6) {
-				return false;
-			} else if (state[x][r] != color) {
-				return false;
-			}
-		}
-		return true;
-	}
+    public void printBoard(int[][] state) {
+        if (state == null) {
+            System.out.println("nUL!LL!L");
+            return;
+        }
 
-	private boolean hasFourSouthEast(int c, int r, int[][] state) {
-		int color = state[c][r];
-		if (color == 0) {
-			return false;
-		}
-		int y = c;
-		int x = r;
-		for (int k = 0; k < 4; k++) {
-			if (y > this.y - 1 || x > this.x - 1) {
-				return false;
-			}
-			if ((y > 6) || (x > 5)) {
-				return false;
-			}
-			if (state[y][x] != color) {
-				return false;
-			}
-			y++;
-			x++;
-		}
-		return true;
-	}
+        for (int j = 0; j < this.y; j++) {
+            for (int i = 0; i < this.x; i++) {
+                System.out.print(state[i][j] + " ");
+            }
+            System.out.print("\n");
+        }
 
-	private boolean hasFourSouthWest(int c, int r, int[][] state) {
-		int color = state[c][r];
-		if (color == 0) {
-			return false;
-		}
-		int y = c;
-		int x = r;
-		for (int k = 0; k < 4; k++) {
-			if (y < 0 || x > this.x - 1) {
-				return false;
-			}
-			if ((y < 0) || (x > 5)) {
-				return false;
-			}
-			if (state[y][x] != color) {
-				return false;
-			}
-			y--;
-			x++;
-		}
-		return true;
-	}
+    }
 
-	private boolean hasFourSouth(int c, int r, int[][] state) {
-		int color = state[c][r];
-		if (color == 0) {
-			return false;
-		}
-		for (int x = r; x < r + 4; x++) {
-			if (x > this.y - 1) {
-				return false;
-			}
-			if (x > 5) {
-				return false;
-			} else if (state[c][x] != color) {
-				return false;
-			}
-		}
-		return true;
-	}
+    private boolean hasFourEast(int c, int r, int[][] state) {
+        int color = state[c][r];
+        if (color == 0) {
+            return false;
+        }
+        for (int x = c; x < c + 4; x++) {
+            if (x > this.x - 1) {
+                return false;
+            }
+            if (x > 6) {
+                return false;
+            } else if (state[x][r] != color) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-	public int hasWinner(int[][] state) {
-		boolean hasFour = false;
-		for (int c = 0; c < this.x; c++) {
-			for (int r = 0; r < this.y; r++) {
-				if (hasFourSouth(c, r, state)) {
-					return state[c][r];
-				}
-				if (hasFourEast(c, r, state)) {
-					return state[c][r];
-				}
-				if (hasFourSouthEast(c, r, state)) {
-					return state[c][r];
-				}
-				if (hasFourSouthWest(c, r, state)) {
-					return state[c][r];
-				}
-			}
-		}
-		return 0;
-	}
+    private boolean hasFourSouthEast(int c, int r, int[][] state) {
+        int color = state[c][r];
+        if (color == 0) {
+            return false;
+        }
+        int y = c;
+        int x = r;
+        for (int k = 0; k < 4; k++) {
+            if (y > this.y - 1 || x > this.x - 1) {
+                return false;
+            }
+            if ((y > 6) || (x > 5)) {
+                return false;
+            }
+            if (state[y][x] != color) {
+                return false;
+            }
+            y++;
+            x++;
+        }
+        return true;
+    }
 
-	public boolean isFull(int[][] state) {
-		for (int c = 0; c < this.x; c++) {
-			for (int r = 0; r < this.y; r++) {
-				if (state[c][r] == 0) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
+    private boolean hasFourSouthWest(int c, int r, int[][] state) {
+        int color = state[c][r];
+        if (color == 0) {
+            return false;
+        }
+        int y = c;
+        int x = r;
+        for (int k = 0; k < 4; k++) {
+            if (y < 0 || x > this.x - 1) {
+                return false;
+            }
+            if ((y < 0) || (x > 5)) {
+                return false;
+            }
+            if (state[y][x] != color) {
+                return false;
+            }
+            y--;
+            x++;
+        }
+        return true;
+    }
 
-	public int[][] copyDoblAr(int[][] org) {
-		int[][] copy = new int[org.length][org[0].length];
-		for (int y = 0; y < org.length; y++) {
-			for (int x = 0; x < org[y].length; x++) {
-				copy[y][x] = org[y][x];
-			}
+    private boolean hasFourSouth(int c, int r, int[][] state) {
+        int color = state[c][r];
+        if (color == 0) {
+            return false;
+        }
+        for (int x = r; x < r + 4; x++) {
+            if (x > this.y - 1) {
+                return false;
+            }
+            if (x > 5) {
+                return false;
+            } else if (state[c][x] != color) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-		}
-		return copy;
-	}
+    public int hasWinner(int[][] state) {
+        boolean hasFour = false;
+        for (int c = 0; c < this.x; c++) {
+            for (int r = 0; r < this.y; r++) {
+                if (hasFourSouth(c, r, state)) {
+                    return state[c][r];
+                }
+                if (hasFourEast(c, r, state)) {
+                    return state[c][r];
+                }
+                if (hasFourSouthEast(c, r, state)) {
+                    return state[c][r];
+                }
+                if (hasFourSouthWest(c, r, state)) {
+                    return state[c][r];
+                }
+            }
+        }
+        return 0;
+    }
+
+    public boolean isFull(int[][] state) {
+        for (int c = 0; c < this.x; c++) {
+            for (int r = 0; r < this.y; r++) {
+                if (state[c][r] == 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public int[][] copyDoblAr(int[][] org) {
+        int[][] copy = new int[org.length][org[0].length];
+        for (int y = 0; y < org.length; y++) {
+            for (int x = 0; x < org[y].length; x++) {
+                copy[y][x] = org[y][x];
+            }
+
+        }
+        return copy;
+    }
 }
