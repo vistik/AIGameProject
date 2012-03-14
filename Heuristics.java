@@ -4,6 +4,11 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class Heuristics {
+    private HashMap<String, Integer> memory;
+    
+    public Heuristics(){
+        this.memory = new HashMap<String, Integer>();
+    }
      public static int heuristicHorizontal(int playerID, int[][] state, HashMap<String, Integer> patterns) {
         String hash = "";
         int value = 0;
@@ -37,7 +42,12 @@ public class Heuristics {
 
     }
 
-    public static int heuristics(int playerID, int[][] state, HashMap<String, Integer> patterns) {
+    public int heuristics(int playerID, int[][] state, HashMap<String, Integer> patterns) {
+        try {
+            int v = ((Integer) this.memory.get(Misc.getHash(state))).intValue();
+            return v;
+        } catch (Exception e) {
+        }
         if (state == null) {
             return 0;
         }
@@ -49,6 +59,7 @@ public class Heuristics {
         }
         int us = Heuristics.heuristicVertical(playerID, state,patterns) + Heuristics.heuristicHorizontal(playerID, state,patterns) + Heuristics.heuristicsSouthEast(playerID, state,patterns) + Heuristics.heuristicsSouthWest(playerID, state,patterns);
         int them = Heuristics.heuristicVertical(opponent, state,patterns) + Heuristics.heuristicHorizontal(opponent, state,patterns)+ Heuristics.heuristicsSouthEast(opponent, state,patterns) + Heuristics.heuristicsSouthWest(opponent, state,patterns);
+        this.memory.put(Misc.getHash(state), us + them);
         return us + them;
     }
 

@@ -17,9 +17,9 @@ public class Misc {
     }
 
     public static String getHash(int[][] state) {
-        if (state == null) {
-            System.out.println("Det fejer");
-        }
+//        if (state == null) {
+//            System.out.println("Det fejer");
+//        }
         String hash = "";
         int y = state[0].length;
         int x = state.length;

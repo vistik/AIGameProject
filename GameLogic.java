@@ -13,6 +13,7 @@ public class GameLogic implements IGameLogic {
     private int time;
     private int moves;
     private int depth;
+    private Heuristics h;
 
     public GameLogic() {
     }
@@ -36,6 +37,9 @@ public class GameLogic implements IGameLogic {
         this.patterns.put("0100", 1);
         this.patterns.put("0010", 1);
         this.patterns.put("0001", 1);
+        
+        Heuristics h = new Heuristics(); 
+        this.h = h;
 
     }
 
@@ -137,7 +141,7 @@ public class GameLogic implements IGameLogic {
         for (int i = 0; i < this.x; i++) {
             int[][] s = Misc.copyDoblAr(state);
             newState = insertCoin(i, playerID, s);
-            int h = Heuristics.heuristics(playerID, newState,this.patterns);
+            int h = this.h.heuristics(playerID, newState,this.patterns);
             actions.add(newState);
 
 
@@ -197,7 +201,7 @@ public class GameLogic implements IGameLogic {
                 return -1000;
         }
         if (level == 0) {
-            return Heuristics.heuristics(1, state,this.patterns);
+            return this.h.heuristics(1, state,this.patterns);
         } else {
             level--;
         }
@@ -246,7 +250,7 @@ public class GameLogic implements IGameLogic {
                 return -1000;
         }
         if (level == 0) {
-            return Heuristics.heuristics(2, state,this.patterns);
+            return this.h.heuristics(2, state,this.patterns);
         } else {
             level--;
         }
