@@ -1,8 +1,7 @@
 
 import java.util.*;
 
-// http://www.overclockers.com/forums/showthread.php?t=554653
-public class GameLogic implements IGameLogic {
+public class VKJJGameLogic implements IGameLogic {
 
     private int x = 0;
     private int y = 0;
@@ -15,7 +14,7 @@ public class GameLogic implements IGameLogic {
     private int depth;
     private Heuristics h;
 
-    public GameLogic() {
+    public VKJJGameLogic() {
     }
 
     public void initializeGame(int x, int y, int playerID) {
@@ -42,6 +41,11 @@ public class GameLogic implements IGameLogic {
         this.h = h;
 
     }
+    
+    /**
+     * Test if there is a game winner
+     * @return 
+     */
 
     public Winner gameFinished() {
 
@@ -58,6 +62,12 @@ public class GameLogic implements IGameLogic {
         }
         return Winner.NOT_FINISHED;
     }
+    
+    /**
+     * Test if there is a game winner in the gamestate
+     * @param state
+     * @return 
+     */
 
     public Winner gameFinished(int[][] state) {
         int winner = Game.hasWinner(state);
@@ -73,6 +83,12 @@ public class GameLogic implements IGameLogic {
         }
         return Winner.NOT_FINISHED;
     }
+    
+    /**
+     * insert coin in column from playerID at the board
+     * @param column
+     * @param playerID 
+     */
 
     public void insertCoin(int column, int playerID) {
         if (this.board[column][0] != 0) {
@@ -92,6 +108,14 @@ public class GameLogic implements IGameLogic {
             }
         }
     }
+    
+    /**
+     * insert coin in a possible game state
+     * @param column
+     * @param playerID
+     * @param state
+     * @return the new game state
+     */
 
     public int[][] insertCoin(int column, int playerID, int[][] state) {
         if (state[column][0] != 0) {
@@ -111,6 +135,10 @@ public class GameLogic implements IGameLogic {
         }
         return state;
     }
+    /***
+     * Function to decide the next move and print out stats
+     * @return (int) column to put the coin in
+     */
 
     public int decideNextMove() {
         System.out.println("Player:" + playerID);
@@ -118,8 +146,8 @@ public class GameLogic implements IGameLogic {
         this.moves++;
         System.out.println("Turn:" + this.moves);
         System.out.println("Depth:" + this.depth);
+        System.out.println("Board: " + this.x + "," + this.y);
         int oldmem = this.memory.size();
-//        this.memory = new HashMap<String, Integer>();
         System.out.println("Starts on finding move");
         Stopwatch st = new Stopwatch();
         st.start();
@@ -133,6 +161,12 @@ public class GameLogic implements IGameLogic {
         System.out.println("********************");
         return nextMov;
     }
+    /**
+     * Return the possible action from the given gamestate
+     * @param playerID
+     * @param state
+     * @return 
+     */
 
     public ArrayList<int[][]> getPossibleActions(int playerID, int[][] state) {
         ArrayList<int[][]> actions = new ArrayList<int[][]>();
@@ -141,13 +175,17 @@ public class GameLogic implements IGameLogic {
         for (int i = 0; i < this.x; i++) {
             int[][] s = Misc.copyDoblAr(state);
             newState = insertCoin(i, playerID, s);
-            int h = this.h.heuristics(playerID, newState,this.patterns);
             actions.add(newState);
-
-
         }
         return actions;
     }
+    
+    /**
+     * our minimax function
+     * @param depth
+     * @param playerID
+     * @return 
+     */
 
     public int minmaxdecision(int depth, int playerID) {
         ArrayList<int[][]> actions = null;
@@ -184,6 +222,15 @@ public class GameLogic implements IGameLogic {
         }
         return primI;
     }
+    
+    /**
+     * our max value function
+     * @param state
+     * @param level
+     * @param max
+     * @param min
+     * @return 
+     */
 
     public int maxValue(int[][] state, int level, int max, int min) {
         try {
@@ -233,6 +280,15 @@ public class GameLogic implements IGameLogic {
         }
         return mValue;
     }
+    
+    /**
+     * our min value function
+     * @param state
+     * @param level
+     * @param max
+     * @param min
+     * @return 
+     */
 
     public int minValue(int[][] state, int level, int max, int min) {
         try {

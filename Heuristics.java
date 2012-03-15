@@ -4,12 +4,22 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class Heuristics {
+
     private HashMap<String, Integer> memory;
-    
-    public Heuristics(){
+
+    public Heuristics() {
         this.memory = new HashMap<String, Integer>();
     }
-     public static int heuristicHorizontal(int playerID, int[][] state, HashMap<String, Integer> patterns) {
+    
+    /**
+     * Calculate the horizontal heuristic
+     * @param playerID
+     * @param state
+     * @param patterns
+     * @return 
+     */
+
+    public static int heuristicHorizontal(int playerID, int[][] state, HashMap<String, Integer> patterns) {
         String hash = "";
         int value = 0;
         int y = state[0].length;
@@ -42,6 +52,14 @@ public class Heuristics {
 
     }
 
+    /**
+     * Calculate the total heuristics of the given gamestate
+     *
+     * @param playerID
+     * @param state
+     * @param patterns
+     * @return
+     */
     public int heuristics(int playerID, int[][] state, HashMap<String, Integer> patterns) {
         try {
             int v = ((Integer) this.memory.get(Misc.getHash(state))).intValue();
@@ -57,11 +75,19 @@ public class Heuristics {
         } else {
             opponent = 1;
         }
-        int us = Heuristics.heuristicVertical(playerID, state,patterns) + Heuristics.heuristicHorizontal(playerID, state,patterns) + Heuristics.heuristicsSouthEast(playerID, state,patterns) + Heuristics.heuristicsSouthWest(playerID, state,patterns);
-        int them = Heuristics.heuristicVertical(opponent, state,patterns) + Heuristics.heuristicHorizontal(opponent, state,patterns)+ Heuristics.heuristicsSouthEast(opponent, state,patterns) + Heuristics.heuristicsSouthWest(opponent, state,patterns);
+        int us = Heuristics.heuristicVertical(playerID, state, patterns) + Heuristics.heuristicHorizontal(playerID, state, patterns) + Heuristics.heuristicsSouthEast(playerID, state, patterns) + Heuristics.heuristicsSouthWest(playerID, state, patterns);
+        int them = Heuristics.heuristicVertical(opponent, state, patterns) + Heuristics.heuristicHorizontal(opponent, state, patterns) + Heuristics.heuristicsSouthEast(opponent, state, patterns) + Heuristics.heuristicsSouthWest(opponent, state, patterns);
         this.memory.put(Misc.getHash(state), us + them);
         return us + them;
     }
+    
+    /**
+     * Calculate the vertical heuristic of the given state
+     * @param playerID
+     * @param state
+     * @param patterns
+     * @return 
+     */
 
     public static int heuristicVertical(int playerID, int[][] state, HashMap<String, Integer> patterns) {
 
@@ -96,6 +122,14 @@ public class Heuristics {
 
         return value * factor;
     }
+    
+    /**
+     * Calculate the diagonal heuristics of the given state
+     * @param playerID
+     * @param state
+     * @param patterns
+     * @return 
+     */
 
     public static int heuristicsSouthWest(int playerID, int[][] state, HashMap<String, Integer> patterns) {
         int value = 0;
@@ -155,6 +189,14 @@ public class Heuristics {
 
         return value * factor;
     }
+    
+    /**
+     * Calculate the diagonal heuristics of the given state
+     * @param playerID
+     * @param state
+     * @param patterns
+     * @return 
+     */
 
     public static int heuristicsSouthEast(int playerID, int[][] state, HashMap<String, Integer> patterns) {
         int value = 0;

@@ -1,3 +1,7 @@
+/**
+ * Functions to check if the game has ended download from: http://www.overclockers.com/forums/showthread.php?t=554653
+ * but modified to fit our needs
+ */
 public class Game {
     public static int hasWinner(int[][] state) {
         boolean hasFour = false;

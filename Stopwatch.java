@@ -1,3 +1,7 @@
+/**
+ * Class downloaded from the internet to messure time between moves
+ * @author visti
+ */
 public class Stopwatch {
     
     private long startTime = 0;
